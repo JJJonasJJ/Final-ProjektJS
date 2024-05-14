@@ -3,6 +3,8 @@ const context = canvas.getContext("2d")
 canvas.width = 1000
 canvas.height = 500
 
+
+
 let movespeed = 1
 let xspeed = 2
 let yspeed = -0
@@ -10,10 +12,12 @@ let yspeed = -0
 let xpos = 100
 let ypos = 200
 
-let circlesize = 20
 
+let circleradius = 20
 
-
+//Kalkylerar xmedelpositionen av cirkeln.
+//P.g.a cirkelgeneratorkoden så är ypos automatiskt ymedelpositionen av cirkeln, och behöver därmed ej defineras
+let midxpos = xpos - circleradius
 
 function canvasedgecheck(){
 
@@ -22,7 +26,7 @@ function canvasedgecheck(){
         xpos -= xspeed
     
     }
-    if (xpos > (canvas.width - circlesize)){
+    if (xpos > (canvas.width - circleradius)){
 
         xpos -= xspeed
 
@@ -33,11 +37,10 @@ function canvasedgecheck(){
         ypos -= yspeed
     
     }
-    if (ypos > (canvas.height - circlesize)){
+    if (ypos > (canvas.height - circleradius)){
 
         ypos -= yspeed
       
-
     }
 }
 
@@ -80,9 +83,41 @@ document.onkeyup = function (event) {
 } 
 
 //Innehåller Farligt
-let a = 20
+let a = 200
+let b = 240
+let c = 300
+let d = 340
+
+class obsticle {
+    constructor(sizesmall, sizebig){
+        this.sizes = sizesmall
+        this.sizeb = sizebig
+    }
     
-let b = 40
+    
+    coordsrandomizer() {
+        let min = Math.ceil(this.sizes);
+        let max = Math.floor(this.sizeb);
+        return Math.floor(Math.random() * (max - min + 1) + min); 
+    }
+
+    doobst(){
+
+    context.fillStyle = "black"
+    context.beginPath();
+    context.moveTo(this.sizes, this.sizes);
+    context.lineTo(this.sizeb, this.sizes);
+    context.lineTo(this.sizeb, this.sizeb);
+    context.lineTo(this.sizes, this.sizeb);
+    context.lineTo(this.sizes, this.sizes);
+    context.fill()
+    context.stroke();
+
+    }
+
+}
+
+
 
 function makeobsticle(a,b){
 
@@ -104,10 +139,6 @@ function makeobsticle(a,b){
 
 
 
-
-
-
-
 //Slut på farligt
 
 
@@ -119,21 +150,28 @@ function rendercircle(){
 
     xpos += xspeed
     ypos += yspeed
+    midxpos = xpos + circleradius
 
     context.fillStyle = "red"
 
     context.beginPath();
-    context.arc(xpos, ypos, circlesize, 0, 2 * Math.PI);
+    context.arc(xpos, ypos, circleradius, 0, 2 * Math.PI);
     context.fill()
     context.stroke();
     
    makeobsticle(a,b)
-
-   if((xpos + 20 - b) < (b-a) && xpos > a){
+   t = new obsticle(c,b)
+   
+   if((midxpos > (((a+b)/2) - (((b-a)/2)*0.7)) && midxpos < (((a+b)/2) + (((b-a)/2)*2.6))) && (ypos > ((((a+b)/2) - ((b-a)/2))*0.94) && ypos < ((((a+b)/2) + ((b-a)/2))*1.06))){
+    
         alert("ohno")
 
     }
+
    else{}
+
+
+   
 
 
     canvasedgecheck()
@@ -148,8 +186,3 @@ window.requestAnimationFrame(rendercircle)
 
 
 
-if((xpos+20)<b && xpos > a){
-
-
-
-}
