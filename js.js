@@ -22,7 +22,7 @@ let midxpos = xpos - circleradius
 // Kollar om cirkeln håller på att lämna canvas, och sätter cikeln tillbaka på kanvas om den var på väg att göra det.
 function canvasedgecheck(){
 
-    if (xpos < 21){
+    if (xpos < (circleradius + 1)){ //circleradius är storlek av cirkel, och + 1 är en extra pixel för att förbättra detektionen
 
         xpos -= xspeed
     
@@ -33,7 +33,7 @@ function canvasedgecheck(){
 
     }
 
-    if (ypos < 21){
+    if (ypos < (circleradius + 1)){ //läs kommentar på rad 25
 
         ypos -= yspeed
     
@@ -194,7 +194,6 @@ function rendergame(){
 
     //Tar bort allt från canvas, så att gamla bilder inte syns längre
     context.clearRect(0, 0, canvas.width, canvas.height)
-
 
     //Uppdaterar cirkelns koordinater
     xpos += xspeed
