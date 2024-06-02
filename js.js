@@ -14,6 +14,7 @@ let ypos = 450
 
 let circleradius = 20
 
+
 //Kalkylerar xmedelpositionen av cirkeln.
 //P.g.a cirkelgeneratorkoden så är ypos automatiskt ymedelpositionen av cirkeln, och behöver därmed ej defineras
 let midxpos = xpos - circleradius
@@ -98,98 +99,92 @@ function rng(low,high){
 }
 
 
-// Skapar koordinater för att skapa rektanglar och collision detection
-// De två översta har olika namn för de användes tidigare i utvecklingen.
-let a = rng(180,220)
-let b = rng(220,260)
+let coordarray = [] // Här kommer alla koordinater som spelet använder ligga
 
-let r2s = rng(100, 140)
-let r2b = rng(140, 160)
+function makecoordlist(cordaray){  //funktion som skapar slumpvisa tal som används som koordinater
 
-let r3s = rng(800, 900)
-let r3b = rng(900, 1000)
+    let tempS = 0
+    let tempL = 0
 
-let r4s = rng(0, 80)
-let r4b = rng(80, 160)
+    for (let i = 0; i < 8; i++) { 
 
-let r5s = rng(500, 600)
-let r5b = rng(600, 700)
+        tempS = rng(0,400)
+        tempL = tempS + rng(10,150) //gör så att det större talet faktiskt är större
 
-let r6s = rng(400, 500)
-let r6b = rng(500, 550)
-
-let r7s = rng(300, 450)
-let r7b = rng(450, 460)
-
-let r8s = rng(200, 250)
-let r8b = rng(254, 340)
-
-let r9s = rng(111, 222)
-let r9b = rng(333, 444)
-// Jag är fullt medveten om hur horribelt detta är men jag fick lite slut på tid
-// Och jag tänkte på "Never spend 5 minutes doing anything manually when you can spend 8 hours failing to automate it"
-
-
-
-//Skapar de olika rektanglarna man ska undvika
-function makeobsticle(l,k){
-
-
-
-    context.fillStyle = "black"
-
-    context.beginPath();
-    context.moveTo(l,l);
-    context.lineTo(k,l);
-    context.lineTo(k,k);
-    context.lineTo(l,k);
-    context.lineTo(l,l);
-    context.fill()
-    context.stroke();
-
+        cordaray.push(tempS)
+        cordaray.push(tempL) //Kolla README.txt
+    }
 
 }
-
-
 
 //Kollar om spelet ska ta slut.
 
-function checkgameend(midx, midy, smal, larg){
+function checkifgameend(midx, midy, array){ 
 
+    for(let i = 0; i < array.length; i += 2){ //se funktion makesquare för info om hur loopen fungerar
 
-    // Ja den här linjen är väldigt lång, men det leder till bättre "collision detection"
-    if((midx > (((smal+larg)/2) - (((larg-smal)/2)*0.7)) && midx < (((smal+larg)/2) + (((larg-smal)/2)*2.6))) && (midy > ((((smal+larg)/2) - ((larg-smal)/2))*0.94) && midy < ((((smal+larg)/2) + ((larg-smal)/2))*1.06))){ 
-    
-        alert("Du var för nära en kvadrat och därmed förlorade du! Ladda om sidan och tryck sedan på ok (i den ordningen) för att försöka igen. (En ny 'arena' kommer att skapas).")
-        xspeed = 0
-        yspeed = 0
+        let smal = array[i]
+        let larg = array[(i+1)]
+        
+        if(midx > (((smal+larg)/2) - ((larg-smal)/2)) && midx < (((smal+larg)/2) + ((larg-smal)/2))){ 
+            //Kollar om cirkeln är inom en kvadrat, är den det så tar spelet slut. Nu med kortare rader!
+            if((midy > ((((smal+larg)/2) - (larg-smal)/2)) && midy < ((((smal+larg)/2) + (larg-smal)/2)))){
+
+                alert("Du var för nära en kvadrat och därmed förlorade du! Ladda om sidan och tryck sedan på ok (i den ordningen) för att försöka igen. (En ny 'arena' kommer att skapas).")
+                    
+                xspeed = 0
+                yspeed = 0
+                
+                intentionallycrashprogram()
+                        //orsakar fel som krashar programmet eftersom funktionen inte är definerad
+                        //Detta var den bästa lösningen som jag fann
+                        //som gjorde att alerten inte hindrade användaren från att ladda om sidan
+                        //"If it looks stupid but works, it aint' stupid", och användaren kommer inte att veta
+                
+            }
+
+        }
+        
+        else{}
+
     }
-
-
-    else{}
 }
 
-// Gör en grön rektangel som använder koordinater för vinstområdet, alltså rör man vid den gröna rektangeln, vinner man.
-function makewinarea(){
-
-
-
-    context.fillStyle = "green"
-
-    context.beginPath();
-    context.moveTo(650,50);
-    context.lineTo(650,0);
-    context.lineTo(700,0);
+function makesquare(koord){
+                                //Jag vet att jag skulle göra om så att makewinarea och 
+                                //makeobsticle var samma funktion. det är dock så att
+    context.fillStyle = "green" //Make win area har fyra olika värden (0, 50, 650, 700)
+    context.beginPath();        //Så att en kvadrat kan göras utanför den diagonala linjen
+    context.moveTo(650,50);     //som de andra kvadraterna finns på. (de har bara två värden)
+    context.lineTo(650,0);      //Så jag kan tyvärr inte se ett sätt att "slå samman" de 
+    context.lineTo(700,0);      //till en och samma funktion
     context.lineTo(700,50);
-    context.lineTo(650,50);
+    context.lineTo(650,50);     //också denna kod här ovanför loopen gör en grön kvadrat som visar vinstområdet
     context.fill()
     context.stroke();
 
+    for(let i = 0; i < koord.length; i += 2){ //Går igenom arrayen och tar de två indexen som sitter brevid varandra
+                                              // (0+i och 1+i) och använder värderna som koordinater, och ritar
+                                              //ut en rektangel baserat på det
+        let s = koord[i]
+        let l = koord[(i+1)]  
 
+        context.fillStyle = "black" 
+        context.beginPath();
+        context.moveTo(s,s);
+        context.lineTo(l,s);
+        context.lineTo(l,l);
+        context.lineTo(s,l);
+        context.lineTo(s,s);
+        context.fill()
+        context.stroke();
+    }
 }
 
-//Funktion som rederar canvas och skapar sakerna man ser, och dessutom kollar om man förlorat eller inte (och till och med kanske vunnit!)
 
+makecoordlist(coordarray) //gör arrayen med koordinater som spelaren ska använda
+
+//Funktion som rederar canvas och skapar sakerna man ser, och dessutom kollar om man förlorat eller inte (och till och med kanske vunnit!)
 function rendergame(){
 
     //Tar bort allt från canvas, så att gamla bilder inte syns längre
@@ -198,9 +193,9 @@ function rendergame(){
     //Uppdaterar cirkelns koordinater
     xpos += xspeed
     ypos += yspeed
-    midxpos = xpos + circleradius
+    midxpos = xpos - circleradius
 
-    //Renderar cirkeln
+    //Renderar cirkeln, inte så jättemycket kod som bara används här så jag gör inte om deta till en seperat funktion
     context.fillStyle = "red"
     context.beginPath();
     context.arc(xpos, ypos, circleradius, 0, 2 * Math.PI);
@@ -208,31 +203,14 @@ function rendergame(){
     context.stroke();
     
 
+    makesquare(coordarray) 
+    //skapar kvadraterna spelaren  ska undvika samt vinstområdet
 
-   //Skapar rektanglarna som man ska undvika. Fult gjort, men jag fick lite slut på tid.
-   makeobsticle(a, b)
-   makeobsticle(r2s, r2b)
-   makeobsticle(r3s, r3b)
-   makeobsticle(r4s, r4b)
-   makeobsticle(r5s, r5b)
-   makeobsticle(r6s, r6b)
-   makeobsticle(r7s, r7b)
-   makeobsticle(r8s, r8b)
-   makeobsticle(r9s, r9b)
+    checkifgameend(midxpos, ypos, coordarray) 
+    //kollar om cirkeln är innuti en kvadrat, och slutar spelet om det är så
 
-   //Kollar om cirkel är innuti en rektangel. Det är buggit och kollen går inte alltid så bra och dessutom lite fult gjort.
-   //Men igen, slut på tid 
-   checkgameend(midxpos, ypos, a, b)
-   checkgameend(midxpos, ypos, r2s, r2b)
-   checkgameend(midxpos, ypos, r3s, r3b)
-   checkgameend(midxpos, ypos, r4s, r4b)
-   checkgameend(midxpos, ypos, r5s, r5b)
-   checkgameend(midxpos, ypos, r6s, r6b)
-   checkgameend(midxpos, ypos, r7s, r7b)
-   checkgameend(midxpos, ypos, r8s, r8b)
-   checkgameend(midxpos, ypos, r9s, r9b)
 
-   makewinarea()
+
 
 
    //Kollar cirkeln är inom vinstkoordinaterna, är det det så vinner man.
